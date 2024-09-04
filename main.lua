@@ -65,9 +65,7 @@ function love.draw()
         love.graphics.printf("Aperte espaço para começar!", 0, love.graphics.getHeight() / 2 - 10, love.graphics.getWidth(), "center")
     elseif gameState == "playing" then
         love.graphics.draw(ambiente.background, 0, 0)
-
-        bird.currentAnimation:draw(bird.currentImage, bird.x, bird.y, 0, 1.5, 1.5)
-
+        bird.currentAnimation:draw(bird.currentImage, bird.x, bird.y, 0, 3, 3)
         pipesModule.pipesDraw()  -- Desenha os canos
     end
 end
