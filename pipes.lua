@@ -4,7 +4,7 @@ local canvas_height = love.graphics.getHeight()
 
 local function pipesInit()
     pipes.clock = 0  -- Tempo decorrido desde o último cano gerado
-    pipes.gen_rate = 3  -- Tempo (em segundos) para gerar um novo cano
+    pipes.gen_rate = 1.5  -- Tempo (em segundos) para gerar um novo cano
 end
 
 local function pipesReset()
@@ -17,12 +17,13 @@ end
 -- Cria canos em posições aleatórias
 local function pipeCreate()
     local pipe = {}
-    pipe.width = 50
+    pipe.width = 70
     pipe.height1 = math.random(100, canvas_height - 250)  -- Altura do cano superior (cano 1)
     pipe.empty_space = 250  -- Espaço entre o cano superior e o inferior
     pipe.height2 = canvas_height - pipe.height1 - pipe.empty_space  -- Altura do cano inferior (cano 2)
     pipe.x = canvas_width  -- Posição inicial do cano (fora da tela à direita)
-    pipe.speed = -100  -- Velocidade de movimento dos canos para a esquerda
+    pipe.speed = -200  -- Velocidade de movimento dos canos para a esquerda
+    pipe.scored = false
     return pipe
 end
 
@@ -67,8 +68,8 @@ end
 
 -- Verifica colisão do pássaro com os canos
 local function checkCollision(pipe, bird)
-    local bird_width = bird.width + 45
-    local bird_height = bird.height + 45
+    local bird_width = bird.width 
+    local bird_height = bird.height
 
     -- Verifica colisão com o cano superior
     if bird.x < pipe.x + pipe.width and
