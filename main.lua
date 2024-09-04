@@ -22,7 +22,8 @@ function love.keypressed(key, scancode, isrepeat)
         gameState = "playing"  -- Muda o estado do jogo para "playing" ao pressionar espaço
     elseif gameState == "playing" then
         if (scancode == 'space' or scancode == 'up' or scancode == 'w') and bird.alive then
-            bird.dy = jump_force  -- Aplica a força do pulo ao pássaro
+            bird.dy = jump_force
+            bird.jumping = true
         end
     end
 end
@@ -33,7 +34,6 @@ function love.update(dt)
         bird.dy = bird.dy + gravity * dt  -- Aplica gravidade ao pássaro
         bird.y = bird.y + bird.dy * dt  -- Atualiza a posição vertical do pássaro
 
-        -- Limita o pássaro a não sair da tela
         if bird.y > canvas_height - bird.height then
             bird.y = canvas_height - bird.height
             bird.dy = 0
@@ -44,6 +44,7 @@ function love.update(dt)
             resetGame()  -- Reinicia o jogo se tocar o topo
         end
 
+        birdModule.updateAnimation(dt)
         pipesModule.pipesUpdate(dt)
 
         -- Verifica colisão do pássaro com cada cano
@@ -65,7 +66,7 @@ function love.draw()
     elseif gameState == "playing" then
         love.graphics.draw(ambiente.background, 0, 0)
 
-        love.graphics.draw(bird.sprite, bird.x, bird.y, 0, 0.2, 0.2)  -- Desenha o pássaro
+        bird.currentAnimation:draw(bird.currentImage, bird.x, bird.y, 0, 1.5, 1.5)
 
         pipesModule.pipesDraw()  -- Desenha os canos
     end

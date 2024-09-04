@@ -67,8 +67,8 @@ end
 
 -- Verifica colisão do pássaro com os canos
 local function checkCollision(pipe, bird)
-    local bird_width = bird.sprite:getWidth() * 0.2
-    local bird_height = bird.sprite:getHeight() * 0.2
+    local bird_width = bird.width
+    local bird_height = bird.height
 
     -- Verifica colisão com o cano superior
     if bird.x < pipe.x + pipe.width and
