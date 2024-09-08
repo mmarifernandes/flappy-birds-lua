@@ -1,14 +1,15 @@
 -- Importa os módulos bird e pipes
 local birdModule = require("bird")
 local pipesModule = require("pipes")
-
+local fonteFlappyBird = love.graphics.newFont('/assets/PressStart2P-Regular.ttf', 20)
+local scoreAtual = 0
 local bird = birdModule.bird
 local pipes = pipesModule.pipes
 
 local ambiente = {
     background = love.graphics.newImage('assets/fundo.jpg')
 }
-local instructionFont = love.graphics.newFont(24)  -- Fonte para as instruções
+local instructionFont = love.graphics.newFont(16)  -- Fonte para as instruções
 
 local gravity = 600  -- Valor da gravidade
 local jump_force = -300  -- Força do pulo
@@ -20,10 +21,11 @@ local canvas_height = love.graphics.getHeight()
 
 -- Função que reage às teclas pressionadas
 function love.keypressed(key, scancode, isrepeat)
-    if gameState == "menu" and key == "space" then
-        gameState = "playing"  -- Muda o estado do jogo para "playing" ao pressionar espaço
-    elseif gameState == "playing" then
-        if (scancode == 'space' or scancode == 'up' or scancode == 'w') and bird.alive then
+    if key == "space" then
+        if gameState == "fail" or gameState == "menu" then
+            resetGame()
+            gameState = "playing"
+        elseif gameState == "playing" and bird.alive then
             bird.dy = jump_force
             bird.jumping = true
         end
@@ -39,8 +41,10 @@ function love.update(dt)
         if bird.y > canvas_height - bird.height then
             bird.y = canvas_height - bird.height
             resetGame()  -- Reinicia o jogo se tocar embaixo
+            gameState = "fail"  -- Altera o estado para "fail"
         elseif bird.y < 0 then
             resetGame()  -- Reinicia o jogo se tocar o topo
+            gameState = "fail"  -- Altera o estado para "fail"
         end
 
         birdModule.updateAnimation(dt)
@@ -56,37 +60,37 @@ function love.update(dt)
             if pipesModule.checkCollision(pipe, bird) then
                 bird.alive = false
                 resetGame()  -- Reinicia o jogo se houver colisão
+                gameState = "fail"  -- Altera o estado para "fail"
             end
         end
     end
 end
 
-
-
-
--- Desenha o jogo na tela
 -- Desenha o jogo na tela
 function love.draw()
-    if gameState == "menu" then
+    love.graphics.draw(ambiente.background, 0, 0)  -- Desenha o fundo
 
-        love.graphics.draw(ambiente.background, 0, 0)  -- Desenha o fundo
+    if gameState == "fail" then
         love.graphics.setFont(instructionFont)
+        love.graphics.setFont(fonteFlappyBird)
+        love.graphics.printf("Você perdeu :( Aperte espaço para continuar...", 0, love.graphics.getHeight() / 2 - 10, love.graphics.getWidth(), "center")
+        love.graphics.printf("Sua pontuação foi: " .. scoreAtual, 10, 100, love.graphics.getWidth(), "center")  -- Posição ajustada
+
+    elseif gameState == "menu" then
+        love.graphics.setFont(instructionFont)
+        love.graphics.setFont(fonteFlappyBird)
         love.graphics.printf("Aperte espaço para começar!", 0, love.graphics.getHeight() / 2 - 10, love.graphics.getWidth(), "center")
-    
     elseif gameState == "playing" then
-        love.graphics.draw(ambiente.background, 0, 0)  -- Desenha o fundo primeiro
-        
-        
         bird.currentAnimation:draw(bird.currentImage, bird.x, bird.y, 0, 3, 3)
         pipesModule.pipesDraw()  -- Desenha os canos
       
         love.graphics.setColor(1, 1, 1)
-        
         love.graphics.setFont(scoreFont)
+        love.graphics.setFont(fonteFlappyBird)
         love.graphics.printf("Pontuação: " .. score, 10, 10, love.graphics.getWidth(), "left")  -- Posição ajustada
+        scoreAtual = score
     end
 end
-
 
 -- Reinicia o jogo
 function resetGame()
@@ -96,11 +100,11 @@ function resetGame()
     bird.alive = true
     birdModule.birdInit()
     pipesModule.pipesReset()
-    gameState = "menu"  -- Define o estado do jogo como menu
 end
 
 -- Carregamento inicial
 function love.load()
+
     birdModule.birdInit()
     pipesModule.pipesInit()
 end
