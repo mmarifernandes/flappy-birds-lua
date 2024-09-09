@@ -1,11 +1,15 @@
--- Importa os módulos bird e pipes
 local birdModule = require("bird")
 local pipesModule = require("pipes")
 local fonteFlappyBird = love.graphics.newFont('/assets/PressStart2P-Regular.ttf', 20)
 local scoreAtual = 0
 local bird = birdModule.bird
 local pipes = pipesModule.pipes
-
+local passSound = love.audio.newSource("assets/pass_sound.mp3", "static")  -- Carrega o som de passar
+local flapSound = love.audio.newSource("assets/flap.mp3", "static")  -- Carrega o som de passar
+local dieSound = love.audio.newSource("assets/die.mp3", "static")  -- Carrega o som de passar
+local ambientSound = love.audio.newSource("assets/ambient.mp3", "static")  -- Carrega o som de passar
+    ambientSound:setVolume(0.2)  -- Ajusta o volume (0.0 a 1.0, onde 1.0 é o volume máximo)
+    ambientSound:setLooping(true)  -- Define a música para repetir
 local ambiente = {
     background = love.graphics.newImage('assets/fundo.jpg')
 }
@@ -28,6 +32,8 @@ function love.keypressed(key, scancode, isrepeat)
         elseif gameState == "playing" and bird.alive then
             bird.dy = jump_force
             bird.jumping = true
+            love.audio.play(flapSound)  -- Toca o som de passar
+
         end
     end
 end
@@ -41,9 +47,12 @@ function love.update(dt)
         if bird.y > canvas_height - bird.height then
             bird.y = canvas_height - bird.height
             resetGame()  -- Reinicia o jogo se tocar embaixo
+            love.audio.play(dieSound)  -- Toca o som de passar
             gameState = "fail"  -- Altera o estado para "fail"
+
         elseif bird.y < 0 then
             resetGame()  -- Reinicia o jogo se tocar o topo
+            love.audio.play(dieSound)  -- Toca o som de passar
             gameState = "fail"  -- Altera o estado para "fail"
         end
 
@@ -55,20 +64,29 @@ function love.update(dt)
             if not pipe.scored and pipe.x + pipe.width < bird.x then
                 score = score + 1  -- Incrementa a pontuação
                 pipe.scored = true  -- Marca o cano como "pontuado" para não contar novamente
+                love.audio.play(passSound)  -- Toca o som de passar
+
             end   
 
             if pipesModule.checkCollision(pipe, bird) then
                 bird.alive = false
                 resetGame()  -- Reinicia o jogo se houver colisão
+                love.audio.play(dieSound)  -- Toca o som de passar
                 gameState = "fail"  -- Altera o estado para "fail"
             end
         end
     end
 end
 
--- Desenha o jogo na tela
+local bgWidth = ambiente.background:getWidth()
+local bgHeight = ambiente.background:getHeight()
+local scaleX = 800 / bgWidth
+local scaleY = 750 / bgHeight
+local scale = math.max(scaleX, scaleY)  -- Mantém a imagem proporcional
+
 function love.draw()
-    love.graphics.draw(ambiente.background, 0, 0)  -- Desenha o fundo
+
+    love.graphics.draw(ambiente.background, 0, 0, 0, scale, scale) -- Desenha o fundo
 
     if gameState == "fail" then
         love.graphics.setFont(instructionFont)
@@ -79,6 +97,7 @@ function love.draw()
     elseif gameState == "menu" then
         love.graphics.setFont(instructionFont)
         love.graphics.setFont(fonteFlappyBird)
+        love.graphics.printf("Flappy Kitty =^._.^=", 0, love.graphics.getHeight() / 3, love.graphics.getWidth(), "center")
         love.graphics.printf("Aperte espaço para começar!", 0, love.graphics.getHeight() / 2 - 10, love.graphics.getWidth(), "center")
     elseif gameState == "playing" then
         bird.currentAnimation:draw(bird.currentImage, bird.x, bird.y, 0, 3, 3)
@@ -104,7 +123,7 @@ end
 
 -- Carregamento inicial
 function love.load()
-
+    ambientSound:play()  -- Inicia a reprodução da música de fundo
     birdModule.birdInit()
     pipesModule.pipesInit()
 end

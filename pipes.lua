@@ -1,6 +1,7 @@
 local pipes = {}  -- Canos (retângulos)
 local canvas_width = love.graphics.getWidth()
 local canvas_height = love.graphics.getHeight()
+local pipeTexture = love.graphics.newImage("assets/building texture.png")
 
 local function pipesInit()
     pipes.clock = 0  -- Tempo decorrido desde o último cano gerado
@@ -14,6 +15,7 @@ local function pipesReset()
     end
 end
 
+
 -- Cria canos em posições aleatórias
 local function pipeCreate()
     local pipe = {}
@@ -24,6 +26,7 @@ local function pipeCreate()
     pipe.x = canvas_width  -- Posição inicial do cano (fora da tela à direita)
     pipe.speed = -200  -- Velocidade de movimento dos canos para a esquerda
     pipe.scored = false
+
     return pipe
 end
 
@@ -56,11 +59,11 @@ local function pipesUpdate(dt)
 end
 
 -- Desenha os canos na tela
-local function pipesDraw()
+local function pipesDraw(score)
     for _, pipe in ipairs(pipes) do
-        love.graphics.setColor(0, 0, 128)  -- Cor dos canos
-        love.graphics.rectangle("fill", pipe.x, 0, pipe.width, pipe.height1)  -- Cano superior
-        love.graphics.rectangle("fill", pipe.x, canvas_height - pipe.height2, pipe.width, pipe.height2)  -- Cano inferior
+        love.graphics.setColor(love.math.colorFromBytes(128, 234, 255)) 
+        love.graphics.draw(pipeTexture, pipe.x, 0, 0, pipe.width / pipeTexture:getWidth(), pipe.height1 / pipeTexture:getHeight())
+        love.graphics.draw(pipeTexture, pipe.x, canvas_height - pipe.height2, 0, pipe.width / pipeTexture:getWidth(), pipe.height2 / pipeTexture:getHeight())
     end
 
     love.graphics.setColor(1, 1, 1)  -- Reseta a cor do cano pra branco (pra conseguir desenhar novos depois)
