@@ -41,38 +41,39 @@ end
 -- Atualiza o estado do jogo
 function love.update(dt)
     if gameState == "playing" and bird.alive then
-        bird.dy = bird.dy + gravity * dt  -- Aplica gravidade ao pássaro
-        bird.y = bird.y + bird.dy * dt  -- Atualiza a posição vertical do pássaro
+        -- Aplica gravidade ao pássaro
+        bird.dy = bird.dy + gravity * dt
+        bird.y = bird.y + bird.dy * dt
 
         if bird.y > canvas_height - bird.height then
             bird.y = canvas_height - bird.height
-            resetGame()  -- Reinicia o jogo se tocar embaixo
-            love.audio.play(dieSound)  -- Toca o som de passar
-            gameState = "fail"  -- Altera o estado para "fail"
+            resetGame()
+            love.audio.play(dieSound)
+            gameState = "fail"
 
         elseif bird.y < 0 then
-            resetGame()  -- Reinicia o jogo se tocar o topo
-            love.audio.play(dieSound)  -- Toca o som de passar
-            gameState = "fail"  -- Altera o estado para "fail"
+            resetGame()
+            love.audio.play(dieSound)
+            gameState = "fail"
         end
 
         birdModule.updateAnimation(dt)
-        pipesModule.pipesUpdate(dt)
+        pipesModule.pipesUpdate(dt, score)
 
-        -- Verifica colisão do pássaro com cada cano
         for _, pipe in ipairs(pipes) do
+            -- Verifica se o pássaro passou pelo cano para aumentar a pontuação
             if not pipe.scored and pipe.x + pipe.width < bird.x then
-                score = score + 1  -- Incrementa a pontuação
-                pipe.scored = true  -- Marca o cano como "pontuado" para não contar novamente
-                love.audio.play(passSound)  -- Toca o som de passar
+                score = score + 1
+                pipe.scored = true
+                love.audio.play(passSound)
+            end
 
-            end   
-
+            -- Verifica colisão com o cano
             if pipesModule.checkCollision(pipe, bird) then
                 bird.alive = false
-                resetGame()  -- Reinicia o jogo se houver colisão
-                love.audio.play(dieSound)  -- Toca o som de passar
-                gameState = "fail"  -- Altera o estado para "fail"
+                resetGame()
+                love.audio.play(dieSound)
+                gameState = "fail"
             end
         end
     end

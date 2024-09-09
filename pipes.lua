@@ -3,18 +3,19 @@ local canvas_width = love.graphics.getWidth()
 local canvas_height = love.graphics.getHeight()
 local pipeTexture = love.graphics.newImage("assets/building texture.png")
 
+-- Inicializa os canos
 local function pipesInit()
     pipes.clock = 0  -- Tempo decorrido desde o último cano gerado
     pipes.gen_rate = 1.5  -- Tempo (em segundos) para gerar um novo cano
 end
 
+-- Reseta os canos
 local function pipesReset()
     pipes.clock = 0
     while #pipes > 0 do
         table.remove(pipes, 1)  -- Remove todos os canos da tabela
     end
 end
-
 
 -- Cria canos em posições aleatórias
 local function pipeCreate()
@@ -30,19 +31,40 @@ local function pipeCreate()
     return pipe
 end
 
--- Atualiza a posição dos canos
-local function pipesUpdate(dt)
+local function pipesUpdate(dt, score)
     pipes.clock = pipes.clock + dt
+
+    local baseSpeed = -200 
+    local speedMultiplier = 1 + math.floor(score / 10) * 0.3 
+    local currentSpeed = baseSpeed * speedMultiplier
+
+    if score >= 50 then
+        pipes.gen_rate = 1.0
+    elseif score >= 30 then
+        pipes.gen_rate = 1.0
+    elseif score >= 20 then
+        pipes.gen_rate = 1.0
+    elseif score >= 10 then
+        pipes.gen_rate = 1.2
+    end
+
+
+    for _, pipe in ipairs(pipes) do
+        pipe.speed = currentSpeed
+    end
+
+    -- Gera um novo cano conforme o tempo passa
     if pipes.clock > pipes.gen_rate then
         pipes.clock = 0
         table.insert(pipes, pipeCreate())  -- Adiciona um novo cano
     end
 
+    -- Move os canos
     for k, pipe in ipairs(pipes) do
-        pipe.x = pipe.x + pipe.speed * dt  -- Move o cano para a esquerda (transição de tela)
+        pipe.x = pipe.x + pipe.speed * dt
     end
 
-    -- Conta quantos canos estão fora da tela
+    -- Remove canos fora da tela
     local dead_pipes_count = 0
     for k, pipe in ipairs(pipes) do
         if pipe.x < -pipe.width then
@@ -52,11 +74,11 @@ local function pipesUpdate(dt)
         end
     end
 
-    -- Remove os canos que saíram da tela
     for _ = 1, dead_pipes_count do
         table.remove(pipes, 1)
     end
 end
+
 
 -- Desenha os canos na tela
 local function pipesDraw(score)
