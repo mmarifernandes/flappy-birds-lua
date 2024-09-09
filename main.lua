@@ -2,6 +2,7 @@ local birdModule = require("bird")
 local pipesModule = require("pipes")
 local fonteFlappyBird = love.graphics.newFont('/assets/PressStart2P-Regular.ttf', 20)
 local scoreAtual = 0
+local bestScore = 0
 local bird = birdModule.bird
 local pipes = pipesModule.pipes
 local passSound = love.audio.newSource("assets/pass_sound.mp3", "static")  -- Carrega o som de passar
@@ -76,6 +77,10 @@ function love.update(dt)
                 gameState = "fail"
             end
         end
+    elseif gameState == "fail" then
+        if scoreAtual > bestScore then
+            bestScore = scoreAtual
+        end
     end
 end
 
@@ -94,7 +99,7 @@ function love.draw()
         love.graphics.setFont(fonteFlappyBird)
         love.graphics.printf("Você perdeu :( Aperte espaço para continuar...", 0, love.graphics.getHeight() / 2 - 10, love.graphics.getWidth(), "center")
         love.graphics.printf("Sua pontuação foi: " .. scoreAtual, 10, 100, love.graphics.getWidth(), "center")  -- Posição ajustada
-
+        love.graphics.printf("Sua melhor pontuação foi: " .. bestScore, 10, 140, love.graphics.getWidth(), "center")
     elseif gameState == "menu" then
         love.graphics.setFont(instructionFont)
         love.graphics.setFont(fonteFlappyBird)
@@ -103,11 +108,14 @@ function love.draw()
     elseif gameState == "playing" then
         bird.currentAnimation:draw(bird.currentImage, bird.x, bird.y, 0, 3, 3)
         pipesModule.pipesDraw()  -- Desenha os canos
-      
         love.graphics.setColor(1, 1, 1)
         love.graphics.setFont(scoreFont)
         love.graphics.setFont(fonteFlappyBird)
         love.graphics.printf("Pontuação: " .. score, 10, 10, love.graphics.getWidth(), "left")  -- Posição ajustada
+        love.graphics.printf("Melhor pontuação: " .. bestScore, 10, 50, love.graphics.getWidth(), "left")
+        if scoreAtual > bestScore then
+            bestScore = scoreAtual
+        end
         scoreAtual = score
     end
 end
@@ -115,7 +123,7 @@ end
 -- Reinicia o jogo
 function resetGame()
     score = 0  -- Reseta a pontuação
-    bird.y = 0
+    bird.y = 100
     bird.dy = 0
     bird.alive = true
     birdModule.birdInit()

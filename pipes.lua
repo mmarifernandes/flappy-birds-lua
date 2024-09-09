@@ -21,8 +21,8 @@ end
 local function pipeCreate()
     local pipe = {}
     pipe.width = 70
-    pipe.height1 = math.random(100, canvas_height - 250)  -- Altura do cano superior (cano 1)
-    pipe.empty_space = 250  -- Espaço entre o cano superior e o inferior
+    pipe.height1 = math.random(100, canvas_height - 300)  -- Altura do cano superior (cano 1)
+    pipe.empty_space = 300  -- Espaço entre o cano superior e o inferior
     pipe.height2 = canvas_height - pipe.height1 - pipe.empty_space  -- Altura do cano inferior (cano 2)
     pipe.x = canvas_width  -- Posição inicial do cano (fora da tela à direita)
     pipe.speed = -200  -- Velocidade de movimento dos canos para a esquerda
@@ -93,8 +93,8 @@ end
 
 -- Verifica colisão do pássaro com os canos
 local function checkCollision(pipe, bird)
-    local bird_width = bird.width 
-    local bird_height = bird.height
+    local bird_width = bird.width * 3
+    local bird_height = bird.height * 3
 
     -- Verifica colisão com o cano superior
     if bird.x < pipe.x + pipe.width and
@@ -112,7 +112,6 @@ local function checkCollision(pipe, bird)
 
     return false
 end
-
 -- Exporta as funções e propriedades dos canos
 return {
     pipes = pipes,

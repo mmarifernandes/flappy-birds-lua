@@ -36,10 +36,10 @@ local function birdInit()
 end
 
 local function updateAnimation(dt)
-    if bird.dy < 0 then
+    if bird.dy < 0 and bird.currentAnimation ~= bird.animations.jump then
         bird.currentAnimation = bird.animations.jump
         bird.currentImage = bird.jumpImage
-    else
+    elseif bird.dy >= 0 and bird.currentAnimation ~= bird.animations.fall then
         bird.currentAnimation = bird.animations.fall
         bird.currentImage = bird.fallImage
     end
