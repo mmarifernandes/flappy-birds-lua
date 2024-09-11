@@ -104,7 +104,7 @@ local function checkCollision(pipe, bird)
     end
 
     -- Verifica colisão com o cano inferior
-    if bird.x < pipe.x + pipe.width and
+    if bird.x +30 < pipe.x + pipe.width and
        bird.x + bird_width > pipe.x and
        bird.y + bird_height > canvas_height - pipe.height2 then
         return true
