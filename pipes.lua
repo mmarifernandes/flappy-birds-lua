@@ -93,13 +93,13 @@ end
 
 -- Verifica colisão do pássaro com os canos
 local function checkCollision(pipe, bird)
-    local bird_width = bird.width * 3
-    local bird_height = bird.height * 3
+    local bird_width = bird.width + 25
+    local bird_height = bird.height + 50
 
     -- Verifica colisão com o cano superior
     if bird.x < pipe.x + pipe.width and
        bird.x + bird_width > pipe.x and
-       bird.y < pipe.height1 then
+       bird.y + 30 < pipe.height1 then
         return true
     end
 
