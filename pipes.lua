@@ -22,7 +22,7 @@ local function pipeCreate()
     local pipe = {}
     pipe.width = 70
     pipe.height1 = math.random(100, canvas_height - 300)  -- Altura do cano superior (cano 1)
-    pipe.empty_space = 300  -- Espaço entre o cano superior e o inferior
+    pipe.empty_space = 250  -- Espaço entre o cano superior e o inferior
     pipe.height2 = canvas_height - pipe.height1 - pipe.empty_space  -- Altura do cano inferior (cano 2)
     pipe.x = canvas_width  -- Posição inicial do cano (fora da tela à direita)
     pipe.speed = -200  -- Velocidade de movimento dos canos para a esquerda
@@ -46,6 +46,8 @@ local function pipesUpdate(dt, score)
         pipes.gen_rate = 1.0
     elseif score >= 10 then
         pipes.gen_rate = 1.2
+    else
+        pipes.gen_rate = 1.5
     end
 
 
@@ -104,7 +106,7 @@ local function checkCollision(pipe, bird)
     end
 
     -- Verifica colisão com o cano inferior
-    if bird.x +30 < pipe.x + pipe.width and
+    if bird.x + 30 < pipe.x + pipe.width and
        bird.x + bird_width > pipe.x and
        bird.y + bird_height > canvas_height - pipe.height2 then
         return true
