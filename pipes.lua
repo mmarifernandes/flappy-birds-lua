@@ -1,19 +1,19 @@
-local pipes = {}  -- Canos (retângulos)
+local pipes = {}
 local canvas_width = love.graphics.getWidth()
 local canvas_height = love.graphics.getHeight()
 local pipeTexture = love.graphics.newImage("assets/building texture.png")
 
--- Inicializa os canos
+-- inicializa os canos
 local function pipesInit()
-    pipes.clock = 0  -- Tempo decorrido desde o último cano gerado
-    pipes.gen_rate = 1.5  -- Tempo (em segundos) para gerar um novo cano
+    pipes.clock = 0  -- tempo decorrido desde o ultimo cano gerado
+    pipes.gen_rate = 1.5  -- tempo para gerar um novo cano
 end
 
--- Reseta os canos
+-- reseta os canos
 local function pipesReset()
     pipes.clock = 0
     while #pipes > 0 do
-        table.remove(pipes, 1)  -- Remove todos os canos da tabela
+        table.remove(pipes, 1)
     end
 end
 
@@ -21,17 +21,17 @@ end
 local function pipeCreate()
     local pipe = {}
     pipe.width = 70
-    pipe.height1 = math.random(100, canvas_height - 300)  -- Altura do cano superior (cano 1)
-    pipe.empty_space = 250  -- Espaço entre o cano superior e o inferior
-    pipe.height2 = canvas_height - pipe.height1 - pipe.empty_space  -- Altura do cano inferior (cano 2)
-    pipe.x = canvas_width  -- Posição inicial do cano (fora da tela à direita)
-    pipe.speed = -200  -- Velocidade de movimento dos canos para a esquerda
+    pipe.height1 = math.random(100, canvas_height - 300)  -- altura do cano cima
+    pipe.empty_space = 250 
+    pipe.height2 = canvas_height - pipe.height1 - pipe.empty_space  -- altura do cano baixo
+    pipe.x = canvas_width  -- posicao inicial do cano 
+    pipe.speed = -200  
     pipe.scored = false
 
     return pipe
 end
 
--- Atualiza os canos
+-- atualiza os canos
 local function pipesUpdate(dt, score)
     pipes.clock = pipes.clock + dt
 
@@ -55,18 +55,18 @@ local function pipesUpdate(dt, score)
         pipe.speed = currentSpeed
     end
 
-    -- Gera um novo cano conforme o tempo passa
+-- gera um novo cano conforme o tempo passa
     if pipes.clock > pipes.gen_rate then
         pipes.clock = 0
-        table.insert(pipes, pipeCreate())  -- Adiciona um novo cano
+        table.insert(pipes, pipeCreate()) 
     end
 
-    -- Move os canos
+-- move os canos
     for k, pipe in ipairs(pipes) do
         pipe.x = pipe.x + pipe.speed * dt
     end
 
-    -- Remove canos fora da tela
+-- remove canos fora da tela
     local dead_pipes_count = 0
     for k, pipe in ipairs(pipes) do
         if pipe.x < -pipe.width then
@@ -81,30 +81,29 @@ local function pipesUpdate(dt, score)
     end
 end
 
--- Desenha os canos na tela
+-- desenha os canos na tela
 local function pipesDraw()
     for _, pipe in ipairs(pipes) do
         love.graphics.setColor(love.math.colorFromBytes(128, 234, 255)) 
         love.graphics.draw(pipeTexture, pipe.x, 0, 0, pipe.width / pipeTexture:getWidth(), pipe.height1 / pipeTexture:getHeight())
         love.graphics.draw(pipeTexture, pipe.x, canvas_height - pipe.height2, 0, pipe.width / pipeTexture:getWidth(), pipe.height2 / pipeTexture:getHeight())
     end
-
-    love.graphics.setColor(1, 1, 1)  -- Reseta a cor do cano pra branco (pra conseguir desenhar novos depois)
+    love.graphics.setColor(1, 1, 1)
 end
 
--- Verifica colisão do pássaro com os canos
+-- verifica colisão do pássaro com os canos
 local function checkCollision(pipe, bird)
     local bird_width = bird.width + 25
     local bird_height = bird.height + 50
 
-    -- Verifica colisão com o cano superior
+    -- superior
     if bird.x < pipe.x + pipe.width and
        bird.x + bird_width > pipe.x and
        bird.y + 30 < pipe.height1 then
         return true
     end
 
-    -- Verifica colisão com o cano inferior
+    -- inferior
     if bird.x + 30 < pipe.x + pipe.width and
        bird.x + bird_width > pipe.x and
        bird.y + bird_height > canvas_height - pipe.height2 then
