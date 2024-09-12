@@ -31,6 +31,13 @@ local bgX2 = bgWidth * scale
 local backgroundSpeed = 100  -- velocidade do movimento do fundo
 local logoScale = 0.35
 
+local floatAmplitude = 10  -- amplitude da flutuação
+local floatSpeed = 2       -- velocidade da flutuação
+local logoY
+
+local blinkTime = 0 -- animação de piscar texto
+local blinkInterval = 0.5
+local showText = true
 
 function love.keypressed(key)
     if key == "space" then
@@ -47,6 +54,13 @@ end
 
 -- atualiza o estado do jogo
 function love.update(dt) -- dt = delta time (usado p atualizar o jogo)
+    -- atualizar o tempo de piscar o texto
+    blinkTime = blinkTime + dt
+    if blinkTime >= blinkInterval then
+        showText = not showText  -- alterna a visibilidade do texto
+        blinkTime = 0  -- reinicia o temporizador
+    end
+
     if gameState == "playing" and bird.alive then
 
         bgX1 = bgX1 - backgroundSpeed * dt
@@ -101,6 +115,11 @@ function love.update(dt) -- dt = delta time (usado p atualizar o jogo)
         if scoreAtual > bestScore then
             bestScore = scoreAtual
         end
+
+    elseif gameState == "menu" then
+        -- atualizar a flutuação da logo no menu
+        local time = love.timer.getTime()
+        logoY = love.graphics.getHeight() / 2 - logo:getHeight() * logoScale - 130 + math.sin(time * floatSpeed) * floatAmplitude
     end
 end
 
@@ -124,10 +143,10 @@ function love.draw()
         love.graphics.setFont(instructionFont)
         love.graphics.setFont(fonteFlappyBird)
         local logoX = (love.graphics.getWidth() - logo:getWidth() * logoScale) / 2
-        local logoY = love.graphics.getHeight() / 2 - logo:getHeight() * logoScale - 130
         love.graphics.draw(logo, logoX, logoY, 0, logoScale, logoScale)
-        love.graphics.printf("Aperte espaço para começar!", 0, love.graphics.getHeight() / 2 + 300, love.graphics.getWidth(), "center")
-
+        if showText then
+            love.graphics.printf("Aperte espaço para começar!", 0, love.graphics.getHeight() / 2 + 300, love.graphics.getWidth(), "center")
+        end
     elseif gameState == "playing" then
 
         bird.currentAnimation:draw(bird.currentImage, bird.x, bird.y, 0, 3, 3)
