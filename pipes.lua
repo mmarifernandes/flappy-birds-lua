@@ -17,7 +17,7 @@ local function pipesReset()
     end
 end
 
--- Cria canos em posições aleatórias
+
 local function pipeCreate()
     local pipe = {}
     pipe.width = 70
@@ -31,6 +31,7 @@ local function pipeCreate()
     return pipe
 end
 
+-- Atualiza os canos
 local function pipesUpdate(dt, score)
     pipes.clock = pipes.clock + dt
 
@@ -49,7 +50,6 @@ local function pipesUpdate(dt, score)
     else
         pipes.gen_rate = 1.5
     end
-
 
     for _, pipe in ipairs(pipes) do
         pipe.speed = currentSpeed
@@ -81,9 +81,8 @@ local function pipesUpdate(dt, score)
     end
 end
 
-
 -- Desenha os canos na tela
-local function pipesDraw(score)
+local function pipesDraw()
     for _, pipe in ipairs(pipes) do
         love.graphics.setColor(love.math.colorFromBytes(128, 234, 255)) 
         love.graphics.draw(pipeTexture, pipe.x, 0, 0, pipe.width / pipeTexture:getWidth(), pipe.height1 / pipeTexture:getHeight())
@@ -114,7 +113,7 @@ local function checkCollision(pipe, bird)
 
     return false
 end
--- Exporta as funções e propriedades dos canos
+
 return {
     pipes = pipes,
     pipesInit = pipesInit,
